@@ -5,6 +5,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import zipfile
 
+
 def calculate_statistics(y_true, y_score):
     precision = precision_score(y_true, y_score)
     recall = recall_score(y_true, y_score)
@@ -45,12 +46,13 @@ def set_dataset_params(question, positiveLabel, negativeLabel):
     return inputSuffix, maxLength
 
 
-def get_string_data(data_frame, label_column_name, positiveLabel, negativeLabel):
+def get_string_data(data_frame, label_column_name, question, positiveLabel, negativeLabel):
     texts = []
     labels = []
     for index, row in data_frame.iterrows():
         # Construct the formatted string for the current row
         row_string = ', '.join([f'{column}: {value}' for column, value in row.items() if column != label_column_name])
+        fullMsg = f"{row_string}. {question}"
 
         texts.append(row_string)
         labelInt = int(row[label_column_name])

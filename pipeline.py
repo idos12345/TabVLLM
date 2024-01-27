@@ -35,10 +35,10 @@ class Pipeline:
         print(f"question: {question}")
         print(f"positive label: {positiveLabel}")
         print(f"negative label: {negativeLabel}")
-        test_data = None
+
         inputSuffix, maxLength = set_dataset_params(question, positiveLabel, negativeLabel)
         tokenized_datasets, test_data = pre_processor.processDataSet(dataset, dataset_metadata['labelColumnName'],
-                                                                     positiveLabel, negativeLabel)
+                                                                     question, positiveLabel, negativeLabel)
 
         trainer_instance = Trainer(self.tokenizer, self.model)
         trainer = trainer_instance.get_trainer(tokenized_datasets)
@@ -46,5 +46,5 @@ class Pipeline:
         trainer.save_model()
 
         post_processor = postprocess.PostProcessor(self.tokenizer, self.model)
-        post_processor.run_test_data(test_data, inputSuffix, dataset_metadata['labelColumnName'])
-        post_processor.calculate_statistics()
+        post_processor.run_test_data(test_data, inputSuffix, dataset_metadata['labelColumnName'], positiveLabel, negativeLabel)
+        print(post_processor.calculate_statistics())

@@ -51,7 +51,7 @@ class Preprocessor(Processor):
 
         return question, positiveLabel, negativeLabel
 
-    def processDataSet(self, data, label_column_name, positiveLabel, negativeLabel):
+    def processDataSet(self, data, question, label_column_name, positive_label, negative_label):
 
         if len(data) > 5000:
             data = data.head(5000)
@@ -59,11 +59,24 @@ class Preprocessor(Processor):
         test_data = data.drop(train_data.index)  # 20% for testing
 
         dataset = DatasetDict(
-            train=Dataset.from_dict(get_string_data(train_data, label_column_name, positiveLabel, negativeLabel)),
-            test=Dataset.from_dict(get_string_data(test_data, label_column_name, positiveLabel, negativeLabel)),
+            train=Dataset.from_dict(
+                get_string_data(train_data, question, label_column_name, positive_label, negative_label)),
+            test=Dataset.from_dict(
+                get_string_data(test_data, question, label_column_name, positive_label, negative_label)),
         )
 
-        return dataset
+        def preprocess_data(examples):
+            model_inputs = self.tokenizer(examples['texts'], max_length=self.max_input_length, truncation=True)
+
+            # Setup the tokenizer for targets
+            with self.tokenizer.as_target_tokenizer():
+                labels = self.tokenizer(examples["labels"], max_length=self.max_target_length,
+                                        truncation=True)
+            model_inputs["labels"] = labels["input_ids"]
+            return model_inputs
+
+        tokenized_datasets = dataset.map(preprocess_data, batched=True)
+        return tokenized_datasets, test_data
 
     def preprocess_data(self, examples):
         model_inputs = self.tokenizer(examples['texts'], max_length=self.max_input_length, truncation=True)
