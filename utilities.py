@@ -5,7 +5,6 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 import matplotlib.pyplot as plt
 import zipfile
 
-
 def calculate_statistics(y_true, y_score):
     precision = precision_score(y_true, y_score)
     recall = recall_score(y_true, y_score)
@@ -39,8 +38,8 @@ def get_data_set_from_kaggle(info):
     return csv_file_path
 
 
-def set_dataset_params(datasetInfo, positiveLabel, negativeLabel):
-    question = datasetInfo["question"]
+def set_dataset_params(question, positiveLabel, negativeLabel):
+    question = question
     inputSuffix = f"\nPlease answer the following question.\n {question} {positiveLabel} or {negativeLabel}?"
     maxLength = max(len(positiveLabel), len(negativeLabel))
     return inputSuffix, maxLength

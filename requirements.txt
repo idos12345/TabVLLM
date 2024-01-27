@@ -1,5 +1,4 @@
 openai
-transformers
 pandas
 datasets
 kaggle
@@ -7,4 +6,6 @@ sklearn
 click
 matplotlib
 torch
+sentencepiece
+transformers[torch]
 

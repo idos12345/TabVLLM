@@ -1,6 +1,11 @@
 import preprocess, postprocess
 from utilities import *
-from trainer import *
+from trainer import Trainer
+import json
+from transformers import TrainingArguments, AutoTokenizer, DistilBertForSequenceClassification
+from transformers import TrainerCallback, EarlyStoppingCallback, AutoModelForSeq2SeqLM, Seq2SeqTrainingArguments
+from transformers import T5Tokenizer, T5ForConditionalGeneration, DataCollatorForSeq2Seq, Seq2SeqTrainer
+import pandas as pd
 
 
 class Pipeline:
@@ -9,27 +14,37 @@ class Pipeline:
 
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
         self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+        with open("conf.json") as f:
+            conf = json.load(f)
+        os.environ["openai_key"] = conf["openai_key"]
 
-        self.max_input_length = 512
-        self.max_target_length = 64
+    def run(self, dataset_path, method):
+        with open(dataset_path) as f:
+            dataset_metadata = json.load(f)
 
-    def run(self, dataset, method):
         y_true = []  # true labels
         y_score = []  # predicted scores
-        csv_file_path = get_data_set_from_kaggle(dataset)
+        csv_file_path = dataset_metadata["csvFileName"]
+        dataset = pd.read_csv(csv_file_path)
+        pre_processor = preprocess.Preprocessor(self.tokenizer, self.model)
+        question, positiveLabel, negativeLabel = pre_processor.run(dataset, method, dataset_metadata["labelColumnName"])
 
-        with preprocess.Preprocessor() as pre_processor:
-            pre_processor.run(dataset, method)
-            positiveLabel = dataset["positiveLabel"] if dataset.get("positiveLabel") else "Yes"
-            negativeLabel = dataset["negativeLabel"] if dataset.get("negativeLabel") else "No"
-            test_data = None
-            inputSuffix, maxLength = set_dataset_params(dataset, positiveLabel, negativeLabel)
-            tokenized_datasets, test_data = pre_processor.processDataSet(csv_file_path, dataset['labelColumnName'])
+        if question is None:
+            question = dataset_metadata["question"]
 
-        trainer = get_trainer(tokenized_datasets)
+        print(f"question: {question}")
+        print(f"positive label: {positiveLabel}")
+        print(f"negative label: {negativeLabel}")
+        test_data = None
+        inputSuffix, maxLength = set_dataset_params(question, positiveLabel, negativeLabel)
+        tokenized_datasets, test_data = pre_processor.processDataSet(dataset, dataset_metadata['labelColumnName'],
+                                                                     positiveLabel, negativeLabel)
+
+        trainer_instance = Trainer(self.tokenizer, self.model)
+        trainer = trainer_instance.get_trainer(tokenized_datasets)
         trainer.train()
         trainer.save_model()
 
-        with postprocess.PostProcessor() as post_processor:
-            post_processor.run_test_data(test_data, inputSuffix, dataset['labelColumnName'])
-            post_processor.calculate_statistics()
+        post_processor = postprocess.PostProcessor(self.tokenizer, self.model)
+        post_processor.run_test_data(test_data, inputSuffix, dataset_metadata['labelColumnName'])
+        post_processor.calculate_statistics()

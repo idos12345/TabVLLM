@@ -8,6 +8,5 @@ def main(dataset_json, method):
     pipeline = Pipeline()
     pipeline.run(dataset_json, method)
 
-
 if __name__ == '__main__':
     main()

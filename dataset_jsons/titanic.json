@@ -1,0 +1,9 @@
+    {
+      "owner": "competitions",
+      "dataset": "titanic",
+      "csvFileName": "datasets_csvs/titanic.csv",
+      "labelColumnName": "Survived",
+      "question": "Did the person survive?",
+      "positiveLabel": "Yes",
+      "negativeLabel": "No"
+    }
