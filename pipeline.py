@@ -22,8 +22,6 @@ class Pipeline:
         with open(dataset_path) as f:
             dataset_metadata = json.load(f)
 
-        y_true = []  # true labels
-        y_score = []  # predicted scores
         csv_file_path = dataset_metadata["csvFileName"]
         dataset = pd.read_csv(csv_file_path)
         pre_processor = preprocess.Preprocessor(self.tokenizer, self.model)

@@ -1,0 +1,9 @@
+    {
+      "owner": "mastmustu",
+      "dataset": "income",
+      "csvFileName": "dataset_csvs/income.csv",
+      "labelColumnName": "income_>50K",
+      "question": "Is the person income greater than 50K?",
+      "positiveLabel": "Yes",
+      "negativeLabel": "No"
+    }

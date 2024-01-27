@@ -1,0 +1,9 @@
+{
+  "owner": "uciml",
+  "dataset": "pima-indians-diabetes-database",
+  "csvFileName": "dataset_csvs/diabetes.csv",
+  "labelColumnName": "Outcome",
+  "question": "Does the patient have diabetes?",
+  "positiveLabel": "True",
+  "negativeLabel": "False"
+}
