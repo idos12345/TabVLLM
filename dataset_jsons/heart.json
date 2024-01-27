@@ -1,0 +1,9 @@
+{
+  "owner": "fedesoriano",
+  "dataset": "heart-failure-prediction",
+  "csvFileName": "heart.csv",
+  "labelColumnName": "HeartDisease",
+  "question": "Does the person have heart disease?",
+  "positiveLabel": "True",
+  "negativeLabel": "False"
+}

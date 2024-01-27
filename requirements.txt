@@ -1,0 +1,10 @@
+openai
+transformers
+pandas
+datasets
+kaggle
+sklearn
+click
+matplotlib
+torch
+
